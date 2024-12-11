@@ -2,17 +2,27 @@ name: Update App Data
 
 on:
   schedule:
-    - cron: '0 */4 * * *'  # Her 4 saatte bir
-  workflow_dispatch:  # Manuel tetikleme için
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+        with:
+          fetch-depth: 0
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -23,21 +33,27 @@ jobs:
           python -m pip install --upgrade pip
           pip install aiohttp
           
+      - name: Create docs directory
+        run: mkdir -p docs/data
+          
       - name: Run app tracker
         run: |
           python main.py
+        continue-on-error: true
+          
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+          
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './docs'
           
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
-          keep_files: false
-          
-      - name: Create Release
-        if: github.event_name == 'workflow_dispatch'
-        uses: softprops/action-gh-release@v1
-        with:
-          name: App Data Update ${{ github.run_number }}
-          tag_name: update-${{ github.run_number }}
-          body_path: docs/data/index.json
+        id: deployment
+        uses: actions/deploy-pages@v4
