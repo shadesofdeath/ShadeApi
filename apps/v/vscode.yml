@@ -1,4 +1,5 @@
 name: Visual Studio Code
 detect:
   type: github
-  repo: microsoft/vscode
+  info:
+    repo: microsoft/vscode
