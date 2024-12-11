@@ -6,28 +6,30 @@ from .base import BaseAppTracker, AppInfo, AppVersion
 class ChromeTracker(BaseAppTracker):
     async def get_app_info(self) -> Optional[AppInfo]:
         try:
-            data = await self._make_request("https://omahaproxy.appspot.com/json")
+            # Chrome versiyonunu Win64 için al
+            data = await self._make_request("https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Win64")
+            if not data or not data[0]:
+                return None
+
+            latest_version = data[0].get('version')
             
-            win_stable = next(
-                (item for item in data if item["os"] == "win" and item["channel"] == "stable"),
-                None
-            )
-            
-            if not win_stable:
+            if not latest_version:
                 return None
 
             versions = [
                 AppVersion(
-                    version=win_stable["version"],
+                    version=latest_version,
                     architecture="x64",
                     url="https://dl.google.com/chrome/install/ChromeStandaloneSetup64.exe",
-                    type="exe"
+                    type="exe",
+                    size=85000000  # Yaklaşık boyut
                 ),
                 AppVersion(
-                    version=win_stable["version"],
+                    version=latest_version,
                     architecture="x86",
                     url="https://dl.google.com/chrome/install/ChromeStandaloneSetup.exe",
-                    type="exe"
+                    type="exe",
+                    size=75000000  # Yaklaşık boyut
                 )
             ]
 

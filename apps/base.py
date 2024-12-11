@@ -1,9 +1,10 @@
 # apps/base.py
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from datetime import datetime
 from typing import List, Optional, Dict
 import aiohttp
 import logging
+import json
 
 @dataclass
 class AppVersion:
@@ -14,6 +15,10 @@ class AppVersion:
     type: str = "exe"
     size: Optional[int] = None
 
+    def to_dict(self):
+        return {k: str(v) if isinstance(v, datetime) else v 
+                for k, v in asdict(self).items() if v is not None}
+
 @dataclass
 class AppInfo:
     id: str
@@ -23,10 +28,20 @@ class AppInfo:
     homepage: str
     last_updated: datetime
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'publisher': self.publisher,
+            'versions': [v.to_dict() for v in self.versions],
+            'homepage': self.homepage,
+            'last_updated': self.last_updated.isoformat()
+        }
+
 class BaseAppTracker:
     def __init__(self):
         self.headers = {
-            "User-Agent": "App-Tracker/1.0"
+            "User-Agent": "ShadeApi/1.0"
         }
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -36,15 +51,11 @@ class BaseAppTracker:
     
     async def _make_request(self, url: str) -> Dict:
         """Genel HTTP istek fonksiyonu"""
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=self.headers) as response:
-                response.raise_for_status()
-                return await response.json()
-
-    def _format_bytes(self, size_bytes: int) -> str:
-        """Byte değerini insan okunabilir formata çevirir"""
-        for unit in ['B', 'KB', 'MB', 'GB']:
-            if size_bytes < 1024:
-                return f"{size_bytes:.2f}{unit}"
-            size_bytes /= 1024
-        return f"{size_bytes:.2f}TB"
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=self.headers) as response:
+                    response.raise_for_status()
+                    return await response.json()
+        except Exception as e:
+            self.logger.error(f"Error making request to {url}: {e}")
+            raise
