@@ -1,0 +1,20 @@
+name: 7-Zip
+detect:
+  type: scrape
+  info:
+    url: https://www.7-zip.org/
+    selectors:
+      version: 'Download 7-Zip ([\d.]+)'  # Regex ile versiyon
+      description: 'meta[name="description"]'  # CSS selector
+  downloads:
+    base_url: https://www.7-zip.org/a/
+    patterns:
+      - pattern: 7z{version_clean}-x64.exe
+        arch: x64
+        type: exe
+      - pattern: 7z{version_clean}.exe
+        arch: x86
+        type: exe
+      - pattern: 7z{version_clean}-x64.msi
+        arch: x64
+        type: msi

@@ -1,0 +1,11 @@
+name: Visual Studio Code
+detect:
+  type: github
+  repo: microsoft/vscode
+  assets:
+    - pattern: "VSCode.*-x64-.*\\.exe$"
+      arch: x64
+      type: exe
+    - pattern: "VSCode.*-arm64-.*\\.exe$"
+      arch: arm64
+      type: exe

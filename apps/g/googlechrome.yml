@@ -1,0 +1,16 @@
+name: Google Chrome
+detect:
+  type: api
+  info:
+    url: https://chromiumdash.appspot.com/fetch_releases
+    params:
+      platform: Windows
+      channel: Stable
+    version_path: "$[0].version"  # JSONPath
+  downloads:
+    - url: https://dl.google.com/chrome/install/ChromeStandaloneSetup64.exe
+      arch: x64
+      type: exe
+    - url: https://dl.google.com/chrome/install/ChromeStandaloneSetup.exe
+      arch: x86
+      type: exe
