@@ -1,5 +1,0 @@
-name: Visual Studio Code
-detect:
-  type: github
-  info:
-    repo: microsoft/vscode
