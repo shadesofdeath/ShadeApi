@@ -1,0 +1,16 @@
+{
+  "last_updated": "2024-12-11T18:19:09.816213",
+  "apps_count": 2,
+  "apps": {
+    "googlechrome": {
+      "name": "Google Chrome",
+      "variants": [],
+      "updated_at": "2024-12-11T18:19:09.814328"
+    },
+    "7zip": {
+      "name": "7-Zip",
+      "variants": [],
+      "updated_at": "2024-12-11T18:19:09.816128"
+    }
+  }
+}
